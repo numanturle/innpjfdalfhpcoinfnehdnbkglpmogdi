@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html ng-app="ChromeModifyHeaders" ng-csp>
+    <head>
+        <title>Modify Headers Google Chrome&trade; - Options</title>
+
+        <!-- fileblock:css css -->
+        <link href="lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="lib/animate.css/animate.min.css" rel="stylesheet" />
+        <link href="lib/angularjs-toaster/toaster.css" rel="stylesheet" />
+        <link href="lib/angular-dialog-service/dialogs.min.css" rel="stylesheet" />
+        <link href="lib/select2/select2.css" rel="stylesheet" />
+        <link href="lib/select2/select2-bootstrap.css" rel="stylesheet" />
+        <link href="lib/angular-xeditable-ak/dist/css/xeditable.css" rel="stylesheet" />
+        <link href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+        <!-- endfileblock -->
+        <link rel="stylesheet" href="css/app.css"> 
+    </head>
+    <body ng-controller="OptionsCtrl">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <button type="button" id="btn_start" class="btn btn-default ng-animate bounce" ng-if="isStopped()"
+                                tooltip="Start Modifying Headers" tooltip-placement="bottom" 
+                                ng-click="start()">
+                            <span class="fa fa-play green"></span>
+                        </button>
+                        <button type="button" id="btn_stop" class="btn btn-default" ng-if="isStarted()"
+                                tooltip="Stop Modifying Headers"  tooltip-placement="bottom"
+                                ng-click="stop()">
+                            <span class="fa fa-stop red"></span>
+                        </button>
+                        <button type="button" id="btn_upload" class="btn btn-default" 
+                                tooltip="Import"  tooltip-placement="bottom"
+                                ng-click="upload()">
+                                <span class="fa fa-upload blue"></span>
+                        </button>
+                        <button type="button" id="btn_export" class="btn btn-default"
+                                tooltip="Export"  tooltip-placement="bottom"
+                                ng-click="download()">
+                                <span class="fa fa-download orange"></span> 
+                        </button>
+                        <br/>
+                        <p class="bounce attention" ng-if="isStopped()">
+                            <span>Press button above to start modifying headers</span>
+                        </p>
+                    </div>                
+                    <div class="col-md-4">
+                        <blockquote>
+                            <span class="nowrap">Modify Headers for Google Chrome&trade;</span>
+                            <small>v2.0.7 </small>
+                            <small><a href="http://www.rivetsys.com">Rivet Systems, Inc.</a> </small>
+                        </blockquote>
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" id="btn_enable_all" class="btn btn-default" ng-if="isStarted()"
+                                tooltip="Enable All"  tooltip-placement="bottom"
+                                ng-click="enableAll()">
+                            <span class="fa fa-power-off green"></span>
+                        </button>
+                        <button type="button" id="btn_disable_all" class="btn btn-default" ng-if="isStarted()"
+                                tooltip="Disable All"  tooltip-placement="bottom"
+                                ng-click="disableAll()">
+                            <span class="fa fa-power-off red"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" ng-if="isStopped()"
+                                tooltip="Press play button to enable" 
+                                tooltip-placement="bottom">
+                            <span class="fa fa-power-off lightgray"></span>
+                        </button>
+                        <button type="button" class="btn btn-default" ng-if="isStopped()"
+                                tooltip="Press play button to enable"
+                                tooltip-placement="bottom">
+                            <span class="fa fa-power-off lightgray"></span>
+                        </button>
+                        
+                        <button type="button"  id="btn_remove_all" class="btn btn-default" 
+                                tooltip="Remove All"  tooltip-placement="bottom"
+                                ng-click="removeAll()">
+                            <span class="fa fa-times red"></span>
+                        </button>
+                        <button type="button"  id="btn_add_new" class="btn btn-default" 
+                                tooltip="Add New"  tooltip-placement="bottom"
+                                ng-click="addHeader()">
+                            <span class="fa fa-plus blue"></span>
+                        </button>
+                        <br/>
+                        <p class="bounce attention" ng-if="isStopped()">
+                            <span>Extension is STOPPED</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </nav>  
+
+        <div class="container">
+            <table class="table table-bordered table-hover table-condensed" style="width:auto;">
+                <tr style="font-weight: bold">
+                    <th class="col-md-1">Order</th>
+                    <th class="col-md-1">Action</th>
+                    <th class="col-md-2">Name</th>
+                    <th class="col-md-3">Value</th>
+                    <th class="col-md-3">Description</th>
+                    <th class="col-md-1">State</th>
+                    <th class="col-md-1">Actions</th>
+                </tr>
+                <tr ng-repeat="header in headers track by header.index" 
+                    ng-class="{'enabled': (header.state === 'ENABLED') && isStarted(), 
+                               'disabled': (header.state === 'DISABLED') || isStopped()}">
+                    <td><span e-form="rowform" e-name="index" id="id_{{header.index}}">{{header.index}}</span></td>
+                    <td>
+                        <span editable-select="header.action" e-name="action"
+                              e-form="rowform" e-required e-ng-change="changeAction(header, this.$data)"
+                              e-ng-options="action.value as action.text for action in actions"
+                              e-id="action_{{header.index}}">
+                            {{ showAction(header)}}
+                        </span>
+                    </td>
+                    <td>
+                        <span editable-text="header.name" e-name="name" id="cmh_name_{{ header.index}}"
+                              e-form="rowform" e-required e-typeahead-min-length="0"
+                              e-typeahead="header for header in commonHeaders | filter:$viewValue | limitTo:8"
+                              id="name_{{header.index}}">
+                            {{ header.name || 'empty' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span editable-text="header.value" e-name="value" 
+                              e-form="rowform" e-required id="cmh_value_{{ header.index}}"
+                              id="value_{{header.index}}">
+                            {{ header.value || 'na' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span editable-text="header.description" e-name="description" 
+                              e-form="rowform" e-required
+                              id="desc_{{header.index}}">
+                            {{ header.description || 'empty' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span>
+                            {{ header.state || 'empty' }}
+                        </span>
+                    </td>
+                    <td style="white-space: nowrap">
+                        <!-- form -->
+                        <form editable-form name="rowform" shown="inserted == header"
+                              ng-show="rowform.$visible" class="form-buttons form-inline">
+                            <button type="button" ng-disabled="rowform.$waiting" 
+                                    ng-click="save(rowform, header)" 
+                                    class="btn btn-default" tooltip="Save"
+                                    id="btn_save_{{header.index}}">
+                                <span class="fa fa-save green"></span>
+                            </button>
+                            <button type="button" ng-disabled="rowform.$waiting" 
+                                    ng-click="cancelAdvice(rowform, $index)" 
+                                    class="btn btn-default" tooltip="Cancel"
+                                    id="btn_cancel_{{header.index}}">
+                                <span class="fa fa-rotate-left orange"></span>
+                            </button>
+                        </form>
+                        <div class="buttons" ng-show="!rowform.$visible">
+                            <button type="button" class="btn btn-default" 
+                                    ng-click="editHeader(rowform, header)" tooltip="Edit"
+                                    id="btn_edit_{{header.index}}">
+                                <span class="fa fa-edit blue"></span>
+                            </button>
+                            <button type="button" class="btn btn-default" 
+                                    ng-click="removeHeader($index)" tooltip="Delete"
+                                    id="btn_delete_{{header.index}}">
+                                <span class="fa fa-times red"></span>
+                            </button>
+                            <button type="button" class="btn btn-default" tooltip="Enable"
+                                    ng-click="toggle($index)" 
+                                    ng-if="header.state === 'DISABLED' && isStarted()"
+                                    id="btn_enable_{{header.index}}">
+                                <span class="fa fa-power-off black"></span>
+                            </button>
+                            <button type="button" class="btn btn-default" tooltip="Disable" 
+                                    ng-click="toggle($index)" 
+                                    ng-if="header.state === 'ENABLED' && isStarted()"
+                                    id="btn_disable_{{header.index}}">
+                                <span class="fa fa-power-off black"></span>
+                            </button>
+                            <button type="button" class="btn btn-default" ng-if="isStopped()"
+                                    tooltip="Press play button to enable">
+                                <span class="fa fa-power-off lightgray"></span>
+                            </button>
+                        </div>  
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+
+    <!-- fileblock:js vendor-lib -->
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular-animate/angular-animate.js"></script>
+    <script src="lib/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script src="lib/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="lib/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="lib/angular-ui-utils/ui-utils.js"></script>
+    <script src="lib/angular-cookies/angular-cookies.min.js"></script>
+    <script src="lib/angular-resource/angular-resource.min.js"></script>
+    <script src="lib/angular-translate/angular-translate.min.js"></script>
+    <script src="lib/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="lib/underscore/underscore.js"></script>
+    <script src="lib/angular-underscore/angular-underscore.min.js"></script>
+    <script src="lib/angular-animate/angular-animate.min.js"></script>
+    <script src="lib/angularjs-toaster/toaster.js"></script>
+    <script src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="lib/angular-dialog-service/dialogs-default-translations.js"></script>
+    <script src="lib/angular-dialog-service/dialogs.min.js"></script>
+    <script src="lib/select2/select2.min.js"></script>
+    <script src="lib/jStorage/jstorage.min.js"></script>
+    <script src="lib/angular-xeditable-ak/dist/js/xeditable.js"></script>
+    <script src="lib/moment/min/moment.min.js"></script>
+    <script src="lib/ng-file-upload/angular-file-upload.min.js"></script>
+    <!-- endfileblock -->
+
+    <!-- fileblock:js app-js -->
+    <script src="js/app.js"></script>
+    <!-- endfileblock -->
+    <!-- fileblock:js app-support -->
+    <script src="js/bgp.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/content.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/directives.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/options.js"></script>
+    <script src="js/services.js"></script>
+    <!-- endfileblock -->
+    <toaster-container></toaster-container>
+</html>

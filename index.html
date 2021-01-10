@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" ng-app="ChromeModifyHeaders">
+    <head>
+        <meta charset="utf-8">
+        <title>My AngularJS App</title>
+        <link rel="stylesheet" href="css/app.css"/>
+        <!-- fileblock:js core-js -->
+        <!-- endfileblock -->
+    </head>
+    <body>
+    <toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
+
+    <ul class="menu">
+        <li><a href="#/view1">view1</a></li>
+        <li><a href="#/view2">view2</a></li>
+    </ul>
+
+    <div ng-view></div>
+
+    <div>Angular seed app: v<span app-version></span></div>
+
+    <!-- fileblock:js vendor-lib -->
+    <!-- endfileblock -->
+
+    <!-- fileblock:js app-js -->
+    <!-- endfileblock -->
+    <!-- fileblock:js app-support -->
+    <!-- endfileblock -->
+</body>
+</html>

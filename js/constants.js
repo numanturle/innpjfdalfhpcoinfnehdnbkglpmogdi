@@ -1,0 +1,47 @@
+var cmh = angular.module('ChromeModifyHeaders.constants', []);
+
+cmh.constant('constants', {
+    commonHeaders: [
+        'Accept',
+        'Accept-Charset',
+        'Accept-Encoding',
+        'Accept-Language',
+        'Accept-Datetime',
+        'Authorization',
+        'Cache-Control',
+        'Connection',
+        'Cookie',
+        'Content-Length',
+        'Content-MD5',
+        'Content-Type',
+        'Date',
+        'DNT',
+        'Expect',
+        'From',
+        'Front-End-Https',
+        'Host',
+        'If-Match',
+        'If-Modified-Since',
+        'If-None-Match',
+        'If-Range',
+        'If-Unmodified-Since',
+        'Max-Forwards',
+        'Origin',
+        'Pragma',
+        'Proxy-Authorization',
+        'Proxy-Connection',
+        'Range',
+        'Referer',
+        'TE',
+        'User-Agent',
+        'Upgrade',
+        'Via',
+        'Warning',
+        'X-ATT-DeviceId',
+        'X-Forwarded-For',
+        'X-Forwarded-Proto',
+        'X-Requested-With',
+        'X-Wap-Profile'
+    ]
+});
+

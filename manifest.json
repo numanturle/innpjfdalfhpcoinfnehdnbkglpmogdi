@@ -1,0 +1,25 @@
+{
+   "background": {
+      "persistent": true,
+      "scripts": [ "lib/jquery/dist/jquery.js", "lib/jStorage/jstorage.min.js", "js/bgp.js" ]
+   },
+   "browser_action": {
+      "default_icon": "img/mh-icon-48.png",
+      "default_title": "Modify Headers for Google Chrome™"
+   },
+   "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.google.com; object-src 'self'",
+   "description": "Modify Headers for Google Chrome™",
+   "icons": {
+      "128": "img/mh-icon-128.png",
+      "16": "img/mh-icon-16.png",
+      "48": "img/mh-icon-48.png"
+   },
+   "key": "",
+   "manifest_version": 2,
+   "minimum_chrome_version": "18",
+   "name": "Modify Headers for Google Chrome™",
+   "options_page": "options.html",
+   "permissions": [ "http://*/*", "https://*/*", "storage", "unlimitedStorage", "contextMenus", "cookies", "tabs", "notifications", "webRequest", "webRequestBlocking", "fileSystem", "activeTab", "\u003Call_urls>" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.0.7"
+}
